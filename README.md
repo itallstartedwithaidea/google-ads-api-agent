@@ -1,14 +1,36 @@
-# 🎯 Google Ads API Agent — Full Implementation Guide
+# Google Ads API Agent
 
-> An enterprise-grade, AI-powered Google Ads management system with 28 custom API actions, 6 specialized sub-agents, and live read/write access to Google Ads accounts. Built for deployment on agent platforms that support Claude models and custom actions (e.g., OpenAI Custom GPTs/Agents, or similar agent platforms).
+[![Release](https://img.shields.io/github/v/release/itallstartedwithaidea/google-ads-api-agent)](https://github.com/itallstartedwithaidea/google-ads-api-agent/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+An enterprise-grade, AI-powered Google Ads management system with **28 custom API actions**, **6 specialized sub-agents**, and **live read/write access** to Google Ads accounts via the Google Ads API v22.
+
+The production version runs at **[googleadsagent.ai](https://googleadsagent.ai)** (Buddy) on Cloudflare's edge — with semantic memory, encrypted key storage, automated monitoring, and a credit-based billing system. This repo is the open-source Python agent that powers the same capabilities.
+
+---
+
+## What's New in v2.0
+
+- **Security hardening** — CORS restrictions, rate limiting, error sanitization, GAQL injection prevention
+- **Installable package** — `pip install google-ads-agent` (or download from [Releases](https://github.com/itallstartedwithaidea/google-ads-api-agent/releases))
+- **MIT License** — proper open-source licensing
+- **Production architecture docs** — full Cloudflare Buddy reference in [`docs/BUDDY_ARCHITECTURE.md`](docs/BUDDY_ARCHITECTURE.md)
+- **Security policy** — [`SECURITY.md`](SECURITY.md) with vulnerability reporting and best practices
+- **Contributor guide** — [`CONTRIBUTING.md`](CONTRIBUTING.md) with priority areas and code style
+- **Environment template** — [`.env.example`](.env.example) with all credential placeholders
+
+See the full [CHANGELOG](CHANGELOG.md) for details.
 
 ---
 
 ## Table of Contents
 
 - [Quick Start](#quick-start)
-- [Two Deployment Paths](#two-deployment-paths)
+- [Three Deployment Paths](#three-deployment-paths)
 - [Path A: Deploy via the Anthropic API](#path-a-deploy-via-the-anthropic-api)
+- [Path B: Deploy on an Agent Platform](#path-b-deploy-on-an-agent-platform-manual-ui)
+- [Path C: Cloudflare Production (Buddy)](#path-c-cloudflare-production-buddy)
 - [Repository Structure](#repository-structure)
 - [Prerequisites](#prerequisites)
 - [Step 1: Obtain API Credentials](#step-1-obtain-api-credentials)
@@ -16,56 +38,69 @@
   - [1B: Cloudinary](#1b-cloudinary-credentials)
   - [1C: SearchAPI.io](#1c-searchapiio-credentials)
   - [1D: Google AI (Gemini)](#1d-google-ai--gemini-credentials)
-- [Path B: Deploy on an Agent Platform](#path-b-deploy-on-an-agent-platform-manual-ui)
-  - [Step 2: Create the Main Agent](#step-2-create-the-main-agent)
-  - [Step 3: Install Custom Actions](#step-3-install-custom-actions-28-total)
-  - [Step 4: Create Sub-Agents](#step-4-create-sub-agents-6-total)
-  - [Step 5: Link Sub-Agents](#step-5-link-sub-agents-to-main-agent)
-  - [Step 6: Grant User Access](#step-6-grant-user-access)
-- [Step 7: Validation & Testing](#step-7-validation--testing)
+- [Step 2–7: Agent Platform Setup](#step-2-create-the-main-agent)
+- [Validation & Testing](#step-7-validation--testing)
 - [Credential Patterns Reference](#credential-patterns-reference)
 - [Architecture Overview](#architecture-overview)
+- [Security](#security)
 - [Known Issues](#known-issues)
 - [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/google-ads-api-agent.git
-cd google-ads-agent
+# Option 1: Install as a package
+pip install google-ads-agent
 
-# 2. Copy and fill in your credentials
-cp .env.example .env
-# Edit .env with your API keys (see Step 1 below for how to get each one)
-
-# 3a. PATH A — Programmatic (Anthropic API)
+# Option 2: Clone and install from source
+git clone https://github.com/itallstartedwithaidea/google-ads-api-agent.git
+cd google-ads-api-agent
 pip install -r requirements.txt
-python scripts/validate.py        # Check everything works
-python scripts/cli.py             # Interactive CLI
-# OR
-uvicorn deploy.server:app --port 8000  # REST API server
-# OR
-docker compose up                 # Containerized
 
-# 3b. PATH B — Agent Platform (Manual UI)
-# Follow Steps 2-7 below to build the agent in your platform's UI
+# Configure credentials
+cp .env.example .env
+# Edit .env with your API keys (see Step 1 below)
+
+# Validate setup
+python scripts/validate.py
+
+# Run the interactive agent
+python scripts/cli.py
+
+# Or start the REST API server
+uvicorn deploy.server:app --port 8000
+
+# Or run with Docker
+docker compose up
 ```
 
 ---
 
-## Two Deployment Paths
-
-This repo supports **two ways** to deploy the agent. Pick the one that fits your use case:
+## Three Deployment Paths
 
 | Path | Best For | What You Need |
 |------|----------|---------------|
-| **A: Anthropic API (Programmatic)** | Production apps, SaaS products, automation pipelines, multi-tenant | Anthropic API key + your code |
-| **B: Agent Platform (Manual UI)** | Quick prototyping, single-user, visual builder | Account on an agent platform (OpenAI, etc.) |
+| **A: Anthropic API (Programmatic)** | Production apps, SaaS, automation pipelines | Anthropic API key + Python |
+| **B: Agent Platform (Manual UI)** | Quick prototyping, single-user, visual builder | Agent platform account |
+| **C: Cloudflare Production (Buddy)** | Full-stack with memory, billing, monitoring | Cloudflare account |
 
-**Path A** is what makes this repeatable and scalable. Path B is the original build approach documented later in this README.
+**Path A** is what this repo provides out of the box. Path C is the production system at [googleadsagent.ai](https://googleadsagent.ai) — see [`docs/BUDDY_ARCHITECTURE.md`](docs/BUDDY_ARCHITECTURE.md) for the full architecture.
+
+### What Buddy Adds (Path C)
+
+| Capability | Technology |
+|-----------|-----------|
+| Per-user persistent state | Durable Objects + SQLite |
+| Semantic memory | Vectorize embeddings |
+| Encrypted BYOK storage | AES-256-GCM |
+| Real-time WebSocket | Cloudflare Agents SDK |
+| Automated monitoring | Cron Workers |
+| Credit-based billing | D1 + Stripe |
+| Multi-provider AI | Claude, GPT, Gemini routing |
+| File exports | R2 object storage |
 
 ---
 
@@ -1118,6 +1153,19 @@ Actions that don't call external APIs: Package Installer, Session & State Manage
 
 For the full technical architecture with action schemas, parameter signatures, and delegation flow, see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
+For the Cloudflare Buddy production architecture (Durable Objects, Vectorize, D1, R2, Agents SDK), see **[docs/BUDDY_ARCHITECTURE.md](docs/BUDDY_ARCHITECTURE.md)**.
+
+### How This Repo Compares to Other AI Agents
+
+| Feature | This Agent | Google Ads Scripts | Microsoft Copilot | Perplexity | Generic Claude |
+|---------|-----------|-------------------|-------------------|------------|---------------|
+| Live Google Ads API R/W | 28 actions | JS-only scripting | No Ads access | No API | No API |
+| Write safety (CEP) | Confirm/Execute/Post | None | N/A | N/A | N/A |
+| Multi-provider AI | Claude + GPT + Gemini | N/A | GPT only | Own models | Claude only |
+| Sub-agent delegation | 6 specialists | N/A | N/A | N/A | N/A |
+| Semantic memory | Vectorize (prod) | None | Limited | Built-in | Conversation only |
+| Self-deployable | 3 paths | Script editor | SaaS only | SaaS only | API only |
+
 ---
 
 ## Known Issues
@@ -1178,22 +1226,54 @@ If hitting limits, the system's Filter-First Architecture should help — use `c
 
 ---
 
+## Security
+
+See [`SECURITY.md`](SECURITY.md) for:
+- Vulnerability reporting process
+- CORS, rate limiting, and input validation practices
+- Credential management guidelines
+- Write safety protocol (CEP: Confirm → Execute → Post-check)
+
+Key security features in v2.0:
+- **No wildcard CORS** — server defaults to localhost; configure via `ALLOWED_ORIGINS`
+- **Rate limiting** — 30 req/min per IP (configurable via `RATE_LIMIT_MAX`)
+- **Error sanitization** — generic client errors, full server-side logging
+- **GAQL injection prevention** — period values whitelisted
+- **No hardcoded secrets** — everything via `.env` / environment variables
+
+---
+
 ## License
 
-This project is provided as-is. The Google Ads API is subject to Google's [Terms of Service](https://developers.google.com/google-ads/api/docs/terms). Cloudinary and SearchAPI usage is subject to their respective terms.
+MIT License. See [`LICENSE`](LICENSE) for full text.
+
+The Google Ads API is subject to Google's [Terms of Service](https://developers.google.com/google-ads/api/docs/terms). Third-party services (Cloudinary, SearchAPI, Stripe) are subject to their respective terms.
 
 ---
 
 ## Contributing
 
-1. Fork the repo
-2. Create a feature branch
-3. Build any missing actions (Optimization sub-agent and Shopping & PMax sub-agent are the priority)
-4. Test with a Google Ads test account
-5. Submit a PR
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full guide. Priority areas:
+
+1. **Optimization sub-agent actions** — system prompt exists, needs API actions built
+2. **Shopping & PMax sub-agent actions** — same as above
+3. **Test coverage** — unit tests for the deploy package
+4. **Semantic memory** — port Vectorize memory from Buddy to Python (pgvector/Pinecone)
+5. **Streaming responses** — add SSE endpoint for real-time tool execution
+
+```bash
+# Quick contributor setup
+git clone https://github.com/itallstartedwithaidea/google-ads-api-agent.git
+cd google-ads-api-agent
+python -m venv venv && source venv/bin/activate
+pip install -e ".[all]"
+cp .env.example .env
+python scripts/validate.py
+```
 
 ---
 
-> **Maintained by:** Open Source Community  
-> **Agent Version:** Open Source Edition  
-> **Last Updated:** 2026-02-10
+> **Live at:** [googleadsagent.ai](https://googleadsagent.ai)  
+> **Version:** 2.0.0  
+> **License:** MIT  
+> **Last Updated:** 2026-03-05
