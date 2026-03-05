@@ -18,12 +18,14 @@ Endpoints:
 import os
 import uuid
 import logging
+import time
+from collections import defaultdict
 from typing import Dict, Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 
 from deploy.orchestrator import GoogleAdsAgent, create_agent_system
@@ -33,12 +35,16 @@ logger = logging.getLogger(__name__)
 # ── Session Store ─────────────────────────────────────────────────────────────
 sessions: Dict[str, GoogleAdsAgent] = {}
 
+# ── Rate Limiting ─────────────────────────────────────────────────────────────
+rate_limit_store: Dict[str, list] = defaultdict(list)
+RATE_LIMIT_WINDOW = 60
+RATE_LIMIT_MAX = int(os.environ.get("RATE_LIMIT_MAX", "30"))
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup/shutdown lifecycle."""
     logger.info("Google Ads Agent server starting...")
-    # Validate credentials on startup
     required_keys = ["ANTHROPIC_API_KEY"]
     missing = [k for k in required_keys if not os.environ.get(k)]
     if missing:
@@ -50,19 +56,41 @@ async def lifespan(app: FastAPI):
     sessions.clear()
 
 
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8000,http://127.0.0.1:3000"
+).split(",")
+
 app = FastAPI(
     title="Google Ads Agent API",
     description="Enterprise Google Ads management powered by Claude",
-    version="10.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["POST", "GET", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    """Simple in-memory rate limiter per IP."""
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    rate_limit_store[client_ip] = [
+        t for t in rate_limit_store[client_ip] if t > now - RATE_LIMIT_WINDOW
+    ]
+    if len(rate_limit_store[client_ip]) >= RATE_LIMIT_MAX:
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Rate limit exceeded. Try again shortly."},
+        )
+    rate_limit_store[client_ip].append(now)
+    return await call_next(request)
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -121,8 +149,8 @@ async def chat(request: ChatRequest):
             tool_calls_made=tool_calls,
         )
     except Exception as e:
-        logger.error(f"Chat error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Chat error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An internal error occurred. Check server logs.")
 
 
 @app.post("/sessions", response_model=SessionInfo)
