@@ -1,5 +1,43 @@
 # Changelog
 
+## v2.1.0 — 2026-03-05 (Comprehensive Wiki + Capability Documentation)
+
+### Wiki (15 pages)
+- **Home** — Navigation hub with full capability comparison (Repo vs MCP vs Buddy)
+- **Quick Start** — Install, configure, run in 5 minutes
+- **Credentials Setup** — Google Ads, Anthropic, Cloudinary, SearchAPI, Gemini
+- **Architecture Overview** — System design, data flow, ReAct loop, CEP protocol
+- **Buddy Architecture** — Cloudflare production: Durable Objects, Agents SDK, D1, R2, Vectorize
+- **Tool Reference** — All 21 tools overview with parameters
+- **Read Tools** — All 47 GAQL query types documented
+- **Write Tools** — All 62 mutation operations with CEP safety
+- **AI Tools** — Web search, keyword research, URL scanning, PageSpeed, creative builder
+- **Sub-Agents** — 6 specialists: Simba, Nemo, Elsa, Aladdin, Moana, Baymax
+- **GAQL Query Reference** — Full SQL for all 47 queries
+- **Mutation Reference** — Detailed parameter tables for all 62 writes
+- **Security** — CORS, rate limiting, AES-256-GCM encryption, CEP protocol, SSRF, XSS
+- **API Endpoints** — Python REST API + Cloudflare Pages Functions reference
+- **Troubleshooting** — Common issues, debugging tips, getting help
+
+### Documentation Updates
+- Updated `BUDDY_ARCHITECTURE.md` with accurate tool count (21 tools, 47 reads, 62 writes)
+- Added complete tool inventory table replacing abbreviated 22-tool list
+- Updated Python-to-Buddy mapping table with Merchant Center, URL scanning, PageSpeed, creative builder
+- Fixed GAQL query count from "65" to accurate "47"
+- Fixed write operations count from "35+" to accurate "62"
+
+### Capability Audit Results
+Full audit confirmed Buddy production system covers all 23 MCP tools plus:
+- 24 additional GAQL read queries
+- 51 additional write operations
+- 12 AI-powered tools (search, keywords, URL scan, PageSpeed, creative, planning, export)
+- Semantic memory (Vectorize)
+- Real-time WebSocket (Agents SDK)
+- Credit billing (D1 + Stripe)
+- Encrypted BYOK storage (AES-256-GCM)
+- Merchant Center integration (5 operations)
+- Automated monitoring (daily health, weekly reports, outcome tracking)
+
 ## v2.0.0 — 2026-03-05 (Buddy Security Hardening Release)
 
 ### Security Fixes

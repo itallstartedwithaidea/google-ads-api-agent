@@ -51,7 +51,7 @@ The agent processes every user message through a multi-step reasoning loop:
 User message
     → Intent Classification (what does the user want?)
     → Memory Retrieval (what do we already know?)
-    → Tool Selection (which of 22 tools to use?)
+    → Tool Selection (which of 21 tools to use?)
     → Execution (call Google Ads API, web search, etc.)
     → Result Synthesis (format and present findings)
     → Memory Storage (save for future context)
@@ -140,53 +140,58 @@ Applied across the Buddy production system:
 
 ## Google Ads API Coverage
 
-### 22 Tools
+### 21 Tools
 
 | Tool | Capability |
 |------|-----------|
-| list_campaigns | List all campaigns with metrics |
-| list_ad_groups | List ad groups within campaigns |
-| list_keywords | List keywords with quality scores |
-| list_ads | List responsive search ads |
-| get_account_summary | Full account overview |
-| get_campaign_details | Deep dive on single campaign |
-| search_terms_report | Search query analysis |
-| auction_insights | Competitor analysis |
-| get_recommendations | Google's optimization suggestions |
-| create_campaign | New campaign creation |
-| update_campaign_status | Pause/enable campaigns |
-| update_budget | Budget modifications |
-| update_bids | Bid adjustments |
-| add_keywords | New keyword additions |
-| add_negative_keywords | Negative keyword management |
-| create_ad | New ad creation |
-| create_labels | Label management |
-| ad_schedule | Day/time targeting |
-| geo_targeting | Location targeting |
-| device_adjustments | Device bid modifiers |
-| change_history | Account audit trail |
-| pmax_management | Performance Max campaigns |
+| pull_google_ads_data | 47 GAQL read queries (campaigns, keywords, search terms, audiences, etc.) |
+| execute_google_ads_action | 62 write operations with CEP safety |
+| execute_google_ads_batch | Batch mutations in phased execution |
+| compare_performance | Period-over-period performance comparison |
+| generate_keyword_ideas | Google Keyword Planner API |
+| upload_offline_conversions | CRM conversion import via GCLID |
+| upload_customer_match | Email/phone list audience upload |
+| undo_last_write | Rollback info for last mutation |
+| search_web | Google Search, Trends, Ads Transparency Center via SearchAPI |
+| analyze_keywords | SERP-based keyword research |
+| scan_url | URL analysis (GA4, GTM, Meta, consent, SEO) |
+| fetch_pagespeed | PageSpeed Insights / Core Web Vitals |
+| build_creative | AI ad copy generation (RSA, PMax, Display, Social) |
+| review_image | AI vision analysis of creative assets |
+| propose_action_plan | Structured action plan with risk assessment |
+| create_plan | Multi-step execution plan with dependencies |
+| calculate | Deterministic ad math (budget, ROAS, CPA, forecasts) |
+| verify_output | Self-verification (character limits, math, data) |
+| export_file | CSV data export |
+| save_document / load_document | Persistent document storage (audits, strategies, reports) |
+| manage_tasks | Task list management |
+| search_memory | Semantic search over past conversations (Vectorize) |
 
-### 65 GAQL Queries
+### 47 GAQL Read Queries
 
-Pre-built queries covering all major reporting dimensions: campaigns, ad groups, keywords, ads, search terms, audience segments, geographic, device, and time-based performance.
+Pre-built queries covering: account summary, campaigns, ad groups, ads, keywords, search terms, wasted spend, quality scores, audiences (6 types), demographics (4 types), device, geographic, auction insights, impression share, change history, recommendations, conversions, landing pages, video campaigns/ads, shopping, PMax (asset groups, assets, listing groups), placements, topics, schedules, labels, bidding strategies, experiments, extensions, negative keyword lists, campaign criteria, shared budgets, daily/hourly/campaign-daily performance.
 
-### 35+ Write Operations
+### 62 Write Operations
 
-Campaign creation, status changes, budget updates, bid adjustments, keyword management, ad creation, label management, targeting modifications, and more.
+Campaign CRUD (6 channel types), budget management (4 ops), ad group CRUD, RSA + display ad management, keyword management (6 ops), 8 extension types (sitelink, callout, snippet, call, price, promotion, lead form, image), label management, audience targeting, placement/topic targeting, content exclusions, bid modifiers (device, location), ad scheduling, IP exclusions, conversion action management, experiments (create, start, end/promote), PMax asset groups + assets, image/text asset uploads, recommendations (apply, dismiss), batch operations (up to 20 per request), and 5 Merchant Center operations (product CRUD + status).
 
 ## How This Maps to the Python Agent
 
 | Buddy (Cloudflare) | Python Agent (This Repo) |
 |--------------------|--------------------------|
-| `agent.ts` ReAct loop | `deploy/orchestrator.py` agentic loop |
-| 22 TypeScript tools | 28 Python action files in `actions/` |
-| Durable Object state | In-memory session dict (upgrade to Redis) |
-| Vectorize memory | Not implemented (add with pgvector/Pinecone) |
-| D1 billing | Not implemented (add with Stripe SDK) |
-| KV sessions | In-memory dict (upgrade to Redis) |
-| Cron monitoring | Not implemented (add with APScheduler/Celery) |
-| WebSocket real-time | SSE streaming (add via FastAPI) |
+| `brain.js` + `gads.js` ReAct loop | `deploy/orchestrator.py` agentic loop |
+| `agent.ts` Durable Object agent | — (stateless) |
+| 21 TypeScript tools, 47 reads, 62 writes | 28 Python action files in `actions/` |
+| Durable Object SQLite state | In-memory session dict (upgrade to Redis) |
+| Vectorize semantic memory | Not implemented (add with pgvector/Pinecone) |
+| D1 billing with Stripe | Not implemented (add with Stripe SDK) |
+| KV sessions + context | In-memory dict (upgrade to Redis) |
+| `onTask` scheduled monitoring | Not implemented (add with APScheduler/Celery) |
+| WebSocket real-time (Agents SDK) | SSE streaming (add via FastAPI) |
+| Merchant Center integration (5 ops) | Not implemented |
+| URL scanning (GA4, GTM, Meta, consent) | Not implemented |
+| PageSpeed Insights | Not implemented |
+| AI creative builder | Not implemented |
 
 ## Contributing
 
