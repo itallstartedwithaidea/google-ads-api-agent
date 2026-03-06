@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-An enterprise-grade, AI-powered Google Ads management system with **28 custom API actions**, **6 specialized sub-agents**, and **live read/write access** to Google Ads accounts via the Google Ads API v22.
+An enterprise-grade, AI-powered Google Ads management system with **250 custom API actions**, **and multiple specialized tools**, and **live read/write access** to Google Ads accounts via the Google Ads API v22.
 
 The production version runs at **[googleadsagent.ai](https://googleadsagent.ai)** (Buddy) on Cloudflare's edge — with semantic memory, encrypted key storage, automated monitoring, and a credit-based billing system. This repo is the open-source Python agent that powers the same capabilities.
 
