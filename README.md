@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-An enterprise-grade, AI-powered Google Ads management system with **250 custom API actions**, **and multiple specialized tools**, and **live read/write access** to Google Ads accounts via the Google Ads API v22.
+An enterprise-grade, AI-powered Google Ads management system with **28 custom tools**, **6 specialized sub-agents**, and **live read/write access** to Google Ads accounts via the Google Ads API v22.
 
 The production version runs at **[googleadsagent.ai](https://googleadsagent.ai)** (Buddy) on Cloudflare's edge — with semantic memory, encrypted key storage, automated monitoring, and a credit-based billing system. This repo is the open-source Python agent that powers the same capabilities.
 
@@ -191,7 +191,7 @@ YOU: "Show me campaigns for Acme Corp"
 ```bash
 # 1. Clone — gets all 66 files: action code, prompts, schemas, adapter layer
 git clone https://github.com/YOUR_USERNAME/google-ads-api-agent.git
-cd google-ads-agent
+cd google-ads-api-agent
 
 # 2. Virtual env — isolates dependencies
 python -m venv venv
@@ -1270,6 +1270,14 @@ pip install -e ".[all]"
 cp .env.example .env
 python scripts/validate.py
 ```
+
+---
+
+## Related Projects
+
+- **[google-ads-mcp](https://github.com/itallstartedwithaidea/google-ads-mcp)** — Python MCP server with 29 tools for Claude Code, Claude Desktop, Cursor, OpenAI Agents SDK, and any MCP client
+- **[google-ads-gemini-extension](https://github.com/itallstartedwithaidea/google-ads-gemini-extension)** — Gemini CLI extension with 22 MCP tools, skills, commands, and themes
+- **[googleadsagent.ai](https://googleadsagent.ai)** — Production deployment (Buddy) on Cloudflare with semantic memory, billing, and monitoring
 
 ---
 
