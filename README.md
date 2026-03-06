@@ -1275,6 +1275,7 @@ python scripts/validate.py
 
 ## Related Projects
 
+- **[google-ads-skills](https://github.com/itallstartedwithaidea/google-ads-skills)** — Anthropic Agent Skills for Claude (analysis, audit, write, math, MCP)
 - **[google-ads-mcp](https://github.com/itallstartedwithaidea/google-ads-mcp)** — Python MCP server with 29 tools for Claude Code, Claude Desktop, Cursor, OpenAI Agents SDK, and any MCP client
 - **[google-ads-gemini-extension](https://github.com/itallstartedwithaidea/google-ads-gemini-extension)** — Gemini CLI extension with 22 MCP tools, skills, commands, and themes
 - **[googleadsagent.ai](https://googleadsagent.ai)** — Production deployment (Buddy) on Cloudflare with semantic memory, billing, and monitoring
