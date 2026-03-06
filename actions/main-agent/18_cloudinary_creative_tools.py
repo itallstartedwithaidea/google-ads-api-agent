@@ -23,7 +23,7 @@ def get_credentials():
 def generate_signature(params, api_secret):
     sorted_params = sorted(params.items())
     to_sign = '&'.join([f"{k}={v}" for k, v in sorted_params if v is not None]) + api_secret
-    return hashlib.sha1(to_sign.encode()).hexdigest()
+    return hashlib.sha256(to_sign.encode()).hexdigest()
 
 def build_transform_url(cloud_name, public_id, resource_type='image', transformations=None):
     base_url = f"https://res.cloudinary.com/{cloud_name}/{resource_type}/upload"
