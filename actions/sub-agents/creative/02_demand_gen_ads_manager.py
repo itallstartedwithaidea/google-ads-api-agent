@@ -1,98 +1,88 @@
-python
-action Valid Values
-Action	Required Params	Description
-list_campaigns	—	List all Demand Gen campaigns with performance metrics
-list_ads	—	List Demand Gen ads with multi-placement previews (paginated)
-view_previews	—	Alias for list_ads
-create_campaign	campaign_data	Create new Demand Gen campaign (created as PAUSED)
-pause_campaign	campaign_id	Pause a campaign
-enable_campaign	campaign_id	Enable a paused campaign
-pause_ad	ad_group_id, ad_id	Pause an ad
-enable_ad	ad_group_id, ad_id	Enable a paused ad
-next_page	page	Fetch next page
-prev_page	page	Fetch previous page
-campaign_data Schema (for create_campaign)
-{
-  "name": "str",                                  // optional, auto-generated if omitted
-  "daily_budget": 50.00,                          // float, default 50
-  "bidding_strategy": "MAXIMIZE_CONVERSIONS",     // or "MAXIMIZE_CONVERSION_VALUE"
-  "target_cpa": 10.00,                            // optional, for Max Conversions
-  "target_roas": 4.0                              // optional, for Max Conv Value
-}
-json
-Response Shape — Campaigns
-{
-  "status": "success",
-  "campaign_type": "DEMAND_GEN",
-  "count": 3,
-  "campaigns": [
-    {
-      "campaign_id": 123456789,
-      "name": "...",
-      "status": "ENABLED",
-      "channel_type": "DEMAND_GEN",
-      "bidding_strategy": "MAXIMIZE_CONVERSIONS",
-      "daily_budget": 50.00,
-      "metrics": {
-        "impressions": 10000,
-        "clicks": 500,
-        "cost": 250.00,
-        "conversions": 30.0,
-        "revenue": 1500.00,
-        "roas": 6.0,
-        "video_views": 2000
-      }
-    }
-  ]
-}
-json
-Response Shape — Ads
-{
-  "status": "success",
-  "ad_type": "DEMAND_GEN",
-  "ads": [
-    {
-      "ad_id": 123456789,
-      "ad_name": "DemandGen-123456789",
-      "ad_type": "DISCOVERY_MULTI_ASSET_AD",
-      "status": "ENABLED",
-      "approval_status": "APPROVED",
-      "business_name": "...",
-      "headlines": ["..."],
-      "descriptions": ["..."],
-      "call_to_action": "Learn More",
-      "marketing_images_count": 3,
-      "logo_count": 1,
-      "final_urls": ["https://..."],
-      "ad_group_id": 987654321,
-      "ad_group_name": "...",
-      "campaign_id": 111222333,
-      "campaign_name": "...",
-      "metrics": {
-        "impressions": 5000,
-        "clicks": 200,
-        "cost": 100.00,
-        "conversions": 15.0,
-        "video_views": 800
-      },
-      "placements": ["YouTube", "YouTube Shorts", "Discover", "Gmail"],
-      "previews": {
-        "discover": "<div>...</div>",
-        "youtube": "<div>...</div>",
-        "gmail": "<div>...</div>"
-      }
-    }
-  ],
-  "pagination": { "..." }
-}
-json
-Credential Configuration
-Secret Key	Description	Credential ID
-DEVELOPER_TOKEN	Google Ads API Developer Token	4cd2ffd0-3d45-41a0-b5ea-3453c5ac99ef
-CLIENT_ID	OAuth2 Client ID	a86dc1ff-5538-4b57-b142-f6d7bd9c51e6
-CLIENT_SECRET	OAuth2 Client Secret	c1d87a8c-793d-402a-870d-4188ebda8441
-REFRESH_TOKEN	OAuth2 Refresh Token	271b7bda-298e-463d-85cd-4acfb4a5336a
-Full Python Code
+# # action Valid Values
+# # Action	Required Params	Description
+# # list_campaigns	—	List all Demand Gen campaigns with performance metrics
+# # list_ads	—	List Demand Gen ads with multi-placement previews (paginated)
+# # view_previews	—	Alias for list_ads
+# # create_campaign	campaign_data	Create new Demand Gen campaign (created as PAUSED)
+# # pause_campaign	campaign_id	Pause a campaign
+# # enable_campaign	campaign_id	Enable a paused campaign
+# # pause_ad	ad_group_id, ad_id	Pause an ad
+# # enable_ad	ad_group_id, ad_id	Enable a paused ad
+# # next_page	page	Fetch next page
+# # prev_page	page	Fetch previous page
+# # campaign_data Schema (for create_campaign)
+# # {
+# #   "name": "str",                                  // optional, auto-generated if omitted
+# #   "daily_budget": 50.00,                          // float, default 50
+# #   "bidding_strategy": "MAXIMIZE_CONVERSIONS",     // or "MAXIMIZE_CONVERSION_VALUE"
+# #   "target_cpa": 10.00,                            // optional, for Max Conversions
+# #   "target_roas": 4.0                              // optional, for Max Conv Value
+# # }
+# # Response Shape — Campaigns
+# # {
+# #   "status": "success",
+# #   "campaign_type": "DEMAND_GEN",
+# #   "count": 3,
+# #   "campaigns": [
+# #     {
+# #       "campaign_id": 123456789,
+# #       "name": "...",
+# #       "status": "ENABLED",
+# #       "channel_type": "DEMAND_GEN",
+# #       "bidding_strategy": "MAXIMIZE_CONVERSIONS",
+# #       "daily_budget": 50.00,
+# #       "metrics": {
+# #         "impressions": 10000,
+# #         "clicks": 500,
+# #         "cost": 250.00,
+# #         "conversions": 30.0,
+# #         "revenue": 1500.00,
+# #         "roas": 6.0,
+# #         "video_views": 2000
+# #       }
+# #     }
+# #   ]
+# # }
+# # Response Shape — Ads
+# # {
+# #   "status": "success",
+# #   "ad_type": "DEMAND_GEN",
+# #   "ads": [
+# #     {
+# #       "ad_id": 123456789,
+# #       "ad_name": "DemandGen-123456789",
+# #       "ad_type": "DISCOVERY_MULTI_ASSET_AD",
+# #       "status": "ENABLED",
+# #       "approval_status": "APPROVED",
+# #       "business_name": "...",
+# #       "headlines": ["..."],
+# #       "descriptions": ["..."],
+# #       "call_to_action": "Learn More",
+# #       "marketing_images_count": 3,
+# #       "logo_count": 1,
+# #       "final_urls": ["https://..."],
+# #       "ad_group_id": 987654321,
+# #       "ad_group_name": "...",
+# #       "campaign_id": 111222333,
+# #       "campaign_name": "...",
+# #       "metrics": {
+# #         "impressions": 5000,
+# #         "clicks": 200,
+# #         "cost": 100.00,
+# #         "conversions": 15.0,
+# #         "video_views": 800
+# #       },
+# #       "placements": ["YouTube", "YouTube Shorts", "Discover", "Gmail"],
+# #       "previews": {
+# #         "discover": "<div>...</div>",
+# #         "youtube": "<div>...</div>",
+# #         "gmail": "<div>...</div>"
+# #       }
+# #     }
+# #   ],
+# #   "pagination": { "..." }
+# # }
+# # Credential Configuration
 try:
     from google.ads.googleads.client import GoogleAdsClient
     from google.ads.googleads.errors import GoogleAdsException

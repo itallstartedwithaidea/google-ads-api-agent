@@ -1,4 +1,3 @@
-Full Code
 # Google Search API via SearchAPI.io
 import requests
 
@@ -125,39 +124,3 @@ def run(query, location=None, gl="us", hl="en", num_results=10, time_period=None
             "status": "error",
             "message": f"Unexpected error: {str(e)}"
         }
-python
-5.4 Google Ads Transparency Center - API
-Field	Value
-Action ID	458e1715-d525-4af3-8b4a-65fc19675708
-Integration	google_ads
-Created	2026-01-29T19:16:32.699Z
-Updated	2026-01-29T19:16:33.184Z
-Description
-Retrieves competitor ad intelligence from Google Ads Transparency Center - see what ads competitors are running, their formats, and how long they've been active.
-
-Use this for:
-- Competitive intelligence on competitor ad campaigns
-- See what ads a company is running (by domain or advertiser ID)
-- Analyze ad formats (text, image, video) being used
-- Track how long ads have been running
-- Research ad strategies across platforms (YouTube, Search, Shopping, Maps)
-
-Parameters:
-- advertiser_id (optional): Advertiser's unique ID starting with 'AR'. Required if domain not provided.
-- domain (optional): Advertiser's domain (e.g., 'tesla.com'). Required if advertiser_id not provided.
-- region (optional): Region filter (default: 'anywhere')
-- platform (optional): Filter by platform - 'google_play', 'google_maps', 'google_search', 'youtube', 'google_shopping'
-- ad_format (optional): Filter by format - 'text', 'image', 'video'
-- time_period (optional): 'today', 'yesterday', 'last_7_days', 'last_30_days' or custom 'YYYY-MM-DD..YYYY-MM-DD'
-- num (optional): Number of results (default: 40, max: 100)
-- next_page_token (optional): Token for pagination from previous response
-
-Returns:
-- ad_creatives: Array of ads with ID, format, dates shown, advertiser info, preview links
-- format_summary: Count of ads by format type
-- pagination: Token for fetching more results
-- search_information: Total results count
-pgsql
-Function Signature
-def run(advertiser_id=None, domain=None, region="anywhere", platform=None, ad_format=None, 
-        time_period=None, num=40, next_page_token=None)

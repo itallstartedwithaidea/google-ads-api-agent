@@ -1,86 +1,77 @@
-python
-action Valid Values
-Action	Required Params	Description
-list	—	List RDAs with metrics & HTML previews (paginated)
-view_previews	—	Alias for list
-create	ad_group_id, ad_data	Create new RDA (created as PAUSED)
-pause	ad_group_id, ad_id	Pause an ad
-enable	ad_group_id, ad_id	Enable a paused ad
-next_page	page	Fetch next page
-prev_page	page	Fetch previous page
-ad_data Schema (for create)
-{
-  "headlines": ["str", "..."],                    // min 1, max 5 (required)
-  "long_headline": "str",                         // required
-  "descriptions": ["str", "..."],                 // min 1, max 5 (required)
-  "business_name": "str",                         // required
-  "final_urls": ["str", "..."],                   // min 1 (required)
-  "marketing_image_assets": ["resource_name"],    // optional — landscape 1.91:1
-  "square_marketing_image_assets": ["resource_name"], // optional — square 1:1
-  "logo_image_assets": ["resource_name"],         // optional
-  "main_color": "#hex",                           // optional
-  "accent_color": "#hex",                         // optional
-  "call_to_action_text": "str",                   // optional
-  "allow_flexible_color": true,                   // optional, default true
-  "format_setting": "ALL_FORMATS"                 // optional
-}
-json
-Response Shape
-{
-  "status": "success",
-  "ad_type": "RESPONSIVE_DISPLAY_AD",
-  "ads": [
-    {
-      "ad_id": 123456789,
-      "ad_name": "RDA-123456789",
-      "status": "ENABLED",
-      "approval_status": "APPROVED",
-      "business_name": "...",
-      "headlines": ["..."],
-      "long_headline": "...",
-      "descriptions": ["..."],
-      "marketing_images_count": 2,
-      "square_images_count": 1,
-      "logo_images_count": 1,
-      "main_color": "#1a73e8",
-      "accent_color": "#ffffff",
-      "call_to_action_text": "Learn More",
-      "allow_flexible_color": true,
-      "format_setting": "ALL_FORMATS",
-      "final_urls": ["https://..."],
-      "ad_group_id": 987654321,
-      "ad_group_name": "...",
-      "campaign_id": 111222333,
-      "campaign_name": "...",
-      "metrics": {
-        "impressions": 1000,
-        "clicks": 50,
-        "cost": 25.00,
-        "conversions": 3.0,
-        "ctr": 5.0,
-        "avg_cpc": 0.50
-      },
-      "preview_html": "<div>...</div>"
-    }
-  ],
-  "pagination": {
-    "current_page": 1,
-    "page_size": 3,
-    "total_ads": 12,
-    "total_pages": 4,
-    "has_next": true,
-    "has_prev": false,
-    "showing": "1-3 of 12"
-  }
-}
-json
-Credential Configuration
-Secret Key	Description	Credential ID
-DEVELOPER_TOKEN	Google Ads API Developer Token	46be4f21-9710-485f-84dc-73a8c7f363ba
-CLIENT_ID	OAuth2 Client ID	4a079f35-8c7c-48fa-9f14-4a9ce21bcfc2
-CLIENT_SECRET	OAuth2 Client Secret	e49e7c26-43e2-4aca-84e8-3e976990bdbc
-REFRESH_TOKEN	OAuth2 Refresh Token	a33f9f48-9f6f-49f0-a6ea-a76f89457f61
-Full Python Code
+# # action Valid Values
+# # Action	Required Params	Description
+# # list	—	List RDAs with metrics & HTML previews (paginated)
+# # view_previews	—	Alias for list
+# # create	ad_group_id, ad_data	Create new RDA (created as PAUSED)
+# # pause	ad_group_id, ad_id	Pause an ad
+# # enable	ad_group_id, ad_id	Enable a paused ad
+# # next_page	page	Fetch next page
+# # prev_page	page	Fetch previous page
+# # ad_data Schema (for create)
+# # {
+# #   "headlines": ["str", "..."],                    // min 1, max 5 (required)
+# #   "long_headline": "str",                         // required
+# #   "descriptions": ["str", "..."],                 // min 1, max 5 (required)
+# #   "business_name": "str",                         // required
+# #   "final_urls": ["str", "..."],                   // min 1 (required)
+# #   "marketing_image_assets": ["resource_name"],    // optional — landscape 1.91:1
+# #   "square_marketing_image_assets": ["resource_name"], // optional — square 1:1
+# #   "logo_image_assets": ["resource_name"],         // optional
+# #   "main_color": "#hex",                           // optional
+# #   "accent_color": "#hex",                         // optional
+# #   "call_to_action_text": "str",                   // optional
+# #   "allow_flexible_color": true,                   // optional, default true
+# #   "format_setting": "ALL_FORMATS"                 // optional
+# # }
+# # Response Shape
+# # {
+# #   "status": "success",
+# #   "ad_type": "RESPONSIVE_DISPLAY_AD",
+# #   "ads": [
+# #     {
+# #       "ad_id": 123456789,
+# #       "ad_name": "RDA-123456789",
+# #       "status": "ENABLED",
+# #       "approval_status": "APPROVED",
+# #       "business_name": "...",
+# #       "headlines": ["..."],
+# #       "long_headline": "...",
+# #       "descriptions": ["..."],
+# #       "marketing_images_count": 2,
+# #       "square_images_count": 1,
+# #       "logo_images_count": 1,
+# #       "main_color": "#1a73e8",
+# #       "accent_color": "#ffffff",
+# #       "call_to_action_text": "Learn More",
+# #       "allow_flexible_color": true,
+# #       "format_setting": "ALL_FORMATS",
+# #       "final_urls": ["https://..."],
+# #       "ad_group_id": 987654321,
+# #       "ad_group_name": "...",
+# #       "campaign_id": 111222333,
+# #       "campaign_name": "...",
+# #       "metrics": {
+# #         "impressions": 1000,
+# #         "clicks": 50,
+# #         "cost": 25.00,
+# #         "conversions": 3.0,
+# #         "ctr": 5.0,
+# #         "avg_cpc": 0.50
+# #       },
+# #       "preview_html": "<div>...</div>"
+# #     }
+# #   ],
+# #   "pagination": {
+# #     "current_page": 1,
+# #     "page_size": 3,
+# #     "total_ads": 12,
+# #     "total_pages": 4,
+# #     "has_next": true,
+# #     "has_prev": false,
+# #     "showing": "1-3 of 12"
+# #   }
+# # }
+# # Credential Configuration
 try:
     from google.ads.googleads.client import GoogleAdsClient
     from google.ads.googleads.errors import GoogleAdsException

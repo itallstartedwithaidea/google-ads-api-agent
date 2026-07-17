@@ -1,3 +1,152 @@
+# Gemini Nano Banana AI Studio — image generation (Nano Banana / Nano Banana Pro)
+# and video generation (Veo 3.1) via the Google GenAI SDK.
+import base64
+import mimetypes
+import time
+import requests
+
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    import subprocess
+    subprocess.check_call(['pip', 'install', 'google-genai'])
+    from google import genai
+    from google.genai import types
+
+# =============================================================================
+# MODELS & CONSTANTS
+# =============================================================================
+
+MODELS = {
+    'nano_banana_pro': {
+        'id': 'gemini-3-pro-image-preview',
+        'name': 'Nano Banana Pro (Gemini 3 Pro Image)',
+        'icon': '🍌✨',
+        'description': 'Highest quality — 4K, text rendering, grounding, thinking',
+        'max_resolution': '4K',
+        'resolutions': ['1K', '2K', '4K'],
+        'aspect_ratios': ['1:1', '5:4', '4:3', '3:2', '2:3', '3:4', '4:5', '9:16', '16:9', '21:9'],
+        'supports_grounding': True,
+        'supports_thinking': True,
+    },
+    'nano_banana': {
+        'id': 'gemini-2.5-flash-image',
+        'name': 'Nano Banana (Gemini 2.5 Flash Image)',
+        'icon': '🍌',
+        'description': 'Fast, efficient image generation and editing',
+        'max_resolution': '1K',
+        'aspect_ratios': ['1:1', '5:4', '4:3', '3:2', '2:3', '3:4', '4:5', '9:16', '16:9', '21:9'],
+    },
+    'gemini_flash': {
+        'id': 'gemini-2.0-flash-preview-image-generation',
+        'name': 'Gemini Flash Image',
+        'icon': '⚡',
+        'description': 'Fallback image generation model',
+    },
+    'imagen': {
+        'id': 'imagen-3.0-generate-002',
+        'name': 'Imagen 3',
+        'icon': '🎨',
+        'description': 'Dedicated text-to-image model (no editing)',
+    },
+    'veo': {
+        'id': 'veo-3.1-generate-preview',
+        'name': 'Veo 3.1',
+        'icon': '🎬',
+        'description': 'Video generation — 720p/1080p, native audio',
+    },
+    'veo_fast': {
+        'id': 'veo-3.1-fast-generate-preview',
+        'name': 'Veo 3.1 Fast',
+        'icon': '🎬⚡',
+        'description': 'Faster, cheaper video generation',
+    },
+}
+
+VALID_ASPECT_RATIOS = ['1:1', '5:4', '4:3', '3:2', '2:3', '3:4', '4:5', '9:16', '16:9', '21:9']
+RATIO_TOLERANCE = 0.05
+
+DEFAULT_AI_INSTRUCTIONS = (
+    "Generate a high-quality, professional image. "
+    "Keep all text legible and avoid watermarks or artifacts."
+)
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+def get_api_key():
+    """Gemini API key from injected secrets."""
+    try:
+        return secrets.get('GEMINI_API_KEY') or secrets.get('GOOGLE_API_KEY')
+    except NameError:
+        import os
+        return os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+
+def save_binary_file(data, prefix='gemini', extension='png'):
+    """Save binary data to a timestamped file and return the filename."""
+    filename = f"{prefix}_{int(time.time() * 1000)}.{extension}"
+    with open(filename, 'wb') as f:
+        f.write(data)
+    return filename
+
+def download_image_as_base64(url):
+    """Download an image URL and return {'data': b64, 'mime_type': ...}."""
+    try:
+        resp = requests.get(url, timeout=60)
+        resp.raise_for_status()
+        mime = resp.headers.get('Content-Type', 'image/png').split(';')[0]
+        return {'data': base64.b64encode(resp.content).decode('utf-8'), 'mime_type': mime}
+    except Exception as e:
+        return {'error': str(e)}
+
+def normalize_ratio(ratio_string):
+    """Normalize a ratio string to the closest Gemini-supported aspect ratio."""
+    ratio_string = str(ratio_string).strip().replace('x', ':').replace('/', ':')
+    if ratio_string in VALID_ASPECT_RATIOS:
+        return ratio_string
+    try:
+        w, h = ratio_string.split(':')
+        numeric = float(w) / float(h)
+    except (ValueError, ZeroDivisionError):
+        return '1:1'
+    best, best_diff = '1:1', float('inf')
+    for r in VALID_ASPECT_RATIOS:
+        rw, rh = r.split(':')
+        diff = abs(numeric - float(rw) / float(rh))
+        if diff < best_diff:
+            best, best_diff = r, diff
+    return best
+
+def is_ratio_compatible(width, height):
+    """Check whether width x height matches a Gemini-supported ratio."""
+    if not width or not height or width <= 0 or height <= 0:
+        return {'compatible': False, 'reason': 'invalid dimensions'}
+    numeric = width / height
+    for r in VALID_ASPECT_RATIOS:
+        rw, rh = r.split(':')
+        target = float(rw) / float(rh)
+        if abs(numeric - target) / target <= RATIO_TOLERANCE:
+            return {'compatible': True, 'matched_ratio': r, 'numeric_ratio': round(numeric, 4)}
+    return {'compatible': False, 'numeric_ratio': round(numeric, 4)}
+
+# =============================================================================
+# IMAGE GENERATION USING SDK
+# =============================================================================
+
+def generate_image_sdk(prompt, image_url=None, aspect_ratio='1:1', resolution=None,
+                       use_grounding=False, thinking_level=None, model_preference=None):
+    """Generate or edit an image via the Google GenAI SDK with model fallback."""
+    api_key = get_api_key()
+    if not api_key:
+        return {'status': 'error', 'message': 'Gemini API key not configured'}
+
+    client = genai.Client(api_key=api_key)
+    api_ratio = normalize_ratio(aspect_ratio)
+
+    parts = [types.Part.from_text(text=prompt)]
+
     # Add image if provided
     if image_url:
         img_data = download_image_as_base64(image_url)

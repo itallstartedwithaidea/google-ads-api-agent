@@ -1,3 +1,6 @@
+try:
+    from google.ads.googleads.client import GoogleAdsClient
+    from google.ads.googleads.errors import GoogleAdsException
 except ImportError:
     import subprocess
     subprocess.check_call(['pip', 'install', 'google-ads'])

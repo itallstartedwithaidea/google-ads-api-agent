@@ -1,4 +1,3 @@
-Full Code
 # Google Trends API via SearchAPI.io
 import requests
 

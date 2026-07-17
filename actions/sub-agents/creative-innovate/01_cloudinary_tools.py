@@ -1,3 +1,19 @@
+# Cloudinary Creative Tools — image/video transforms with Gemini-vs-gen_fill routing
+import time
+import requests
+
+# =============================================================================
+# GEMINI-COMPATIBLE ASPECT RATIOS
+# =============================================================================
+
+GEMINI_VALID_RATIOS = {
+    '1:1': 1.0,
+    '5:4': 1.25,
+    '4:3': 1.333,
+    '3:2': 1.5,
+    '2:3': 0.667,
+    '3:4': 0.75,
+    '4:5': 0.8,
     '9:16': 0.5625,
     '16:9': 1.778,
     '21:9': 2.333

@@ -1,4 +1,3 @@
-Full Code
 # Google Ads Transparency Center API via SearchAPI.io
 import requests
 
